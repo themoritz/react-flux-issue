@@ -7,7 +7,7 @@
 
 module Main where
 
-import           Control.Concurrent (forkIO)
+import           Control.Concurrent (forkIO, threadDelay)
 import           Control.DeepSeq    (NFData)
 
 import           Data.Typeable      (Typeable)
@@ -25,9 +25,10 @@ data Action
 instance StoreData String where
   type StoreAction String = Action
   transform (SetString str) st = do
-    forkIO $ alterStore store $ SetString2 "2"
+    _ <- threadDelay 1
+    _ <- forkIO $ alterStore store $ SetString2 "2"
     pure $ st ++ str
-  transform (SetString2 str) _ = pure str
+  transform (SetString2 str) st = pure $ st ++ str
 
 app :: ReactView ()
 app = defineControllerView "app" store $ \st () -> do
