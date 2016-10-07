@@ -7,11 +7,10 @@
 
 module Main where
 
-import           Control.Concurrent (forkIO)
-import           Control.DeepSeq    (NFData)
+import           Control.DeepSeq (NFData)
 
-import           Data.Typeable      (Typeable)
-import           GHC.Generics       (Generic)
+import           Data.Typeable   (Typeable)
+import           GHC.Generics    (Generic)
 import           React.Flux
 
 store :: ReactStore String
@@ -25,9 +24,10 @@ data Action
 instance StoreData String where
   type StoreAction String = Action
   transform (SetString str) st = do
-    forkIO $ alterStore store $ SetString2 "2"
+    st' <- transform (SetString2 "2") st
+    pure $ st' ++ str
+  transform (SetString2 str) st =
     pure $ st ++ str
-  transform (SetString2 str) _ = pure str
 
 app :: ReactView ()
 app = defineControllerView "app" store $ \st () -> do
